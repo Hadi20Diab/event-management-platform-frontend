@@ -1,8 +1,27 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-const AuthContext = createContext({});
+/**
+ * @typedef {Object} AuthUser
+ * @property {number|string} id
+ * @property {string} email
+ * @property {string} name
+ * @property {string} role
+ * @property {Array<number>} registeredEvents
+ *
+ * @typedef {Object} AuthContextType
+ * @property {AuthUser|null} user
+ * @property {boolean} loading
+ * @property {(email:string, password:string) => Promise<any>} login
+ * @property {(userData:Object) => Promise<any>} register
+ * @property {() => void} logout
+ * @property {() => boolean} isAdmin
+ */
 
-export const useAuth = () => useContext(AuthContext);
+/** @type {React.Context<AuthContextType>} */
+const AuthContext = createContext(/** @type {AuthContextType} */ ({}));
+
+/** @returns {AuthContextType} */
+export const useAuth = () => /** @type {AuthContextType} */ (useContext(AuthContext));
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
