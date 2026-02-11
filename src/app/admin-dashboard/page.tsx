@@ -1,11 +1,11 @@
+"use client";
 import React, { useState } from 'react';
-import Navbar from '../components/Layout/Navbar';
-import Sidebar from '../components/Layout/Sidebar';
-import EventForm from '../components/Events/EventForm';
-import EventCard from '../components/Events/EventCard';
-import { useAuth } from '../context/AuthContext';
+import Navbar from '../../components/Layout/Navbar';
+import Sidebar from '../../components/Layout/Sidebar';
+import EventForm from '../../components/Events/EventForm';
+import EventCard from '../../components/Events/EventCard';
+import { useAuth } from '../../context/AuthContext';
 
-// Mock data - Replace with API data
 const initialEvents = [
   {
     id: 1,
@@ -35,41 +35,31 @@ const initialEvents = [
   }
 ];
 
-const AdminEvents = () => {
+export default function AdminDashboardPage() {
   const [events, setEvents] = useState(initialEvents);
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [error, setError] = useState('');
+  const { user } = useAuth();
 
   const handleCreate = (eventData) => {
-    // TODO: Replace with API call
-    const newEvent = {
-      ...eventData,
-      id: Date.now(),
-      registered: 0,
-      status: 'active'
-    };
-    
-    setEvents([...events, newEvent]);
+    const newEvent = { ...eventData, id: Date.now(), registered: 0, status: 'active' };
+    setEvents(prev => [...prev, newEvent]);
     setShowForm(false);
     setError('');
     alert('Event created successfully (Mock - Replace with API call)');
   };
 
   const handleUpdate = (eventId, eventData) => {
-    // TODO: Replace with API call
-    setEvents(events.map(event => 
-      event.id === eventId ? { ...event, ...eventData } : event
-    ));
+    setEvents(prev => prev.map(event => event.id === eventId ? { ...event, ...eventData } : event));
     setEditingEvent(null);
     setError('');
     alert('Event updated successfully (Mock - Replace with API call)');
   };
 
   const handleDelete = (eventId) => {
-    // TODO: Replace with API call
-    if (window.confirm('Are you sure you want to delete this event?')) {
-      setEvents(events.filter(event => event.id !== eventId));
+    if (confirm('Are you sure you want to delete this event?')) {
+      setEvents(prev => prev.filter(event => event.id !== eventId));
       alert('Event deleted successfully (Mock - Replace with API call)');
     }
   };
@@ -90,27 +80,14 @@ const AdminEvents = () => {
               <h1>Manage Events</h1>
               <p>Create, update, and delete events</p>
             </div>
-            <button
-              className="btn btn-primary"
-              onClick={() => setShowForm(true)}
-            >
-              Create New Event
-            </button>
+            <button className="btn btn-primary" onClick={() => setShowForm(true)}>Create New Event</button>
           </div>
 
-          {error && (
-            <div className="alert alert-error">
-              {error}
-            </div>
-          )}
+          {error && <div className="alert alert-error">{error}</div>}
 
           <div className="admin-actions">
             <div className="form-group" style={{ flex: 1 }}>
-              <input
-                type="text"
-                placeholder="Search events..."
-                style={{ width: '100%' }}
-              />
+              <input type="text" placeholder="Search events..." style={{ width: '100%' }} />
             </div>
             <select className="form-group" style={{ width: '200px' }}>
               <option value="">All Status</option>
@@ -126,50 +103,23 @@ const AdminEvents = () => {
                 <div className="event-header">
                   <h3 className="event-title">{event.title}</h3>
                   <span className="event-category">{event.category}</span>
-                  <span style={{
-                    float: 'right',
-                    background: event.status === 'active' ? 'var(--success-color)' : 
-                               event.status === 'cancelled' ? 'var(--danger-color)' : 'var(--warning-color)',
-                    color: 'white',
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    fontSize: '12px'
-                  }}>
+                  <span style={{ float: 'right', background: event.status === 'active' ? 'var(--success-color)' : event.status === 'cancelled' ? 'var(--danger-color)' : 'var(--warning-color)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>
                     {event.status}
                   </span>
                 </div>
                 <div className="event-body">
                   <p>{event.description}</p>
                   <div className="event-info">
-                    <div className="event-info-item">
-                      📅 {event.date}
-                    </div>
-                    <div className="event-info-item">
-                      📍 {event.location}
-                    </div>
-                    <div className="event-info-item">
-                      👥 {event.registered} / {event.capacity} registered
-                    </div>
-                    <div className="event-info-item">
-                      💰 ${event.price}
-                    </div>
+                    <div className="event-info-item">📅 {event.date}</div>
+                    <div className="event-info-item">📍 {event.location}</div>
+                    <div className="event-info-item">👥 {event.registered} / {event.capacity} registered</div>
+                    <div className="event-info-item">💰 ${event.price}</div>
                   </div>
                 </div>
                 <div className="event-footer">
                   <div>
-                    <button
-                      className="btn btn-warning"
-                      onClick={() => handleEdit(event)}
-                      style={{ marginRight: '10px' }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleDelete(event.id)}
-                    >
-                      Delete
-                    </button>
+                    <button className="btn btn-warning" onClick={() => handleEdit(event)} style={{ marginRight: '10px' }}>Edit</button>
+                    <button className="btn btn-danger" onClick={() => handleDelete(event.id)}>Delete</button>
                   </div>
                 </div>
               </div>
@@ -188,22 +138,10 @@ const AdminEvents = () => {
       {(showForm || editingEvent) && (
         <div className="event-form-modal">
           <div className="event-form-content">
-            <EventForm
-              event={editingEvent}
-              onSubmit={editingEvent ? 
-                (data) => handleUpdate(editingEvent.id, data) : 
-                handleCreate
-              }
-              onCancel={() => {
-                setShowForm(false);
-                setEditingEvent(null);
-              }}
-            />
+            <EventForm event={editingEvent} onSubmit={editingEvent ? (data) => handleUpdate(editingEvent.id, data) : handleCreate} onCancel={() => { setShowForm(false); setEditingEvent(null); }} />
           </div>
         </div>
       )}
     </div>
   );
-};
-
-export default AdminEvents;
+}
