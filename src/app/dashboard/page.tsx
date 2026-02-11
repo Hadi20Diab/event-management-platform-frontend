@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Layout/Navbar';
 import Sidebar from '../../components/Layout/Sidebar';
 import { FaCalendarCheck, FaMusic, FaTheaterMasks } from 'react-icons/fa';
+import '@/app/page.css'
 
 export default function Dashboard() {
   const { user, isAdmin } = useAuth();
