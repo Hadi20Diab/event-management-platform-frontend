@@ -17,10 +17,10 @@ export default function AdminSidebar() {
   return (
     <aside className="sidebar admin-sidebar">
       <div className="sidebar-brand">Admin</div>
-      <nav>
+      <nav className="sidebar-nav">
         {items.map((it) => (
-          <Link key={it.href + it.label} href={it.href} className={pathname === it.href ? 'active' : ''}>
-            {it.label}
+          <Link key={it.href + it.label} href={it.href} className={`sidebar-link ${pathname === it.href ? 'active' : ''}`}>
+            <span className="sidebar-link-text">{it.label}</span>
           </Link>
         ))}
       </nav>

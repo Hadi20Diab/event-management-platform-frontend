@@ -2,12 +2,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '../../context/AuthContext';
 import { FaHome, FaCalendarAlt, FaList, FaUsersCog } from 'react-icons/fa';
 
-const Sidebar = () => {
-  const { isAdmin } = useAuth();
-
+const Sidebar = ({ isAdmin }) => {
   const pathname = usePathname();
 
   const userLinks = [
@@ -21,7 +18,7 @@ const Sidebar = () => {
     { to: '/admin/events', icon: <FaUsersCog />, label: 'Manage Events' },
   ];
 
-  const links = isAdmin() ? adminLinks : userLinks;
+  const links = isAdmin ? adminLinks : userLinks;
 
   return (
     <aside className="sidebar">

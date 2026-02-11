@@ -1,7 +1,5 @@
 "use client";
 import React, { useState } from 'react';
-import Navbar from '../../components/Layout/Navbar';
-import Sidebar from '../../components/Layout/Sidebar';
 import EventForm from '../../components/Events/EventForm';
 import EventCard from '../../components/Events/EventCard';
 import { useAuth } from '../../context/AuthContext';
