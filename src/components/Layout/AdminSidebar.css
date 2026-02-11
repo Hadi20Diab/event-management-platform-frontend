@@ -1,13 +1,5 @@
-/* Make admin sidebar visually consistent with user sidebar styles in page.css */
-.admin-sidebar {
-  width: 220px;
-  background: white;
-  border-right: 1px solid #e9ecef;
-  padding: 30px 0;
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100vh);
-}
+/* Admin sidebar inherits base styles from .sidebar in page.css */
+/* Only override admin-specific elements (brand, footer) here */
 
 .admin-sidebar .sidebar-brand {
   font-size: 18px;
@@ -16,63 +8,9 @@
   padding: 0 20px 12px 20px;
 }
 
-.admin-sidebar .sidebar-nav {
-  padding: 0 20px;
-}
-
-.admin-sidebar .sidebar-link {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  color: var(--dark-color);
-  text-decoration: none;
-  border-radius: var(--border-radius);
-  margin-bottom: 8px;
-  transition: var(--transition);
-}
-
-.admin-sidebar .sidebar-link:hover {
-  background-color: #f0f2f5;
-}
-
-.admin-sidebar .sidebar-link.active {
-  background-color: var(--primary-color);
-  color: white;
-}
-
 .admin-sidebar .sidebar-footer {
   margin-top: auto;
   padding: 12px 20px 0 20px;
   font-size: 13px;
-  color: var(--sidebar-muted, #94a3b8);
+  color: var(--gray-color);
 }
-
-/* Profile / logout block (consistent with user sidebar) */
-.admin-sidebar .sidebar-user {
-  padding: 12px 20px;
-  border-top: 1px solid #f0f2f5;
-}
-
-.admin-sidebar .user-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.admin-sidebar .avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--primary-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-}
-
-.admin-sidebar .user-info { flex: 1; }
-.admin-sidebar .user-name { font-weight: 600; }
-.admin-sidebar .user-role { font-size: 12px; color: var(--sidebar-muted, #94a3b8); }
-.admin-sidebar .logout-btn { background: transparent; border: none; color: var(--dark-color); cursor: pointer; }
