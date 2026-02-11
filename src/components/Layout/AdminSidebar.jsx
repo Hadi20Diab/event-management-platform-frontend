@@ -10,15 +10,15 @@ export default function AdminSidebar({ user, onLogout }) {
 
   const items = [
     { href: '/admin-dashboard', label: 'Dashboard', icon: <FaTachometerAlt /> },
-    { href: '/admin-dashboard', label: 'Manage Events', icon: <FaCalendarAlt /> },
-    { href: '/admin-dashboard', label: 'Users', icon: <FaUsers /> },
-    { href: '/admin-dashboard', label: 'Reports', icon: <FaChartBar /> },
+    { href: '/admin-dashboard/events', label: 'Manage Events', icon: <FaCalendarAlt /> },
+    { href: '/admin-dashboard/users', label: 'Users', icon: <FaUsers /> },
+    { href: '/admin-dashboard/reports', label: 'Reports', icon: <FaChartBar /> },
   ];
 
   return (
     <aside className="sidebar admin-sidebar">
-      <div className="sidebar-brand">Admin Panel</div>
       <nav className="sidebar-nav">
+        <div className="sidebar-brand">Admin Panel</div>
         {items.map((it) => (
           <Link key={it.href + it.label} href={it.href} className={`sidebar-link ${pathname === it.href ? 'active' : ''}`}>
             <span className="sidebar-icon">{it.icon}</span>
@@ -26,7 +26,7 @@ export default function AdminSidebar({ user, onLogout }) {
           </Link>
         ))}
       </nav>
-      <div className="sidebar-user">
+      <div className="sidebar-footer">
         {user ? (
           <div className="user-row">
             <div className="avatar">{user.name ? user.name.charAt(0).toUpperCase() : 'A'}</div>
@@ -44,7 +44,6 @@ export default function AdminSidebar({ user, onLogout }) {
           </div>
         )}
       </div>
-      <div className="sidebar-footer">Admin tools</div>
     </aside>
   );
 }

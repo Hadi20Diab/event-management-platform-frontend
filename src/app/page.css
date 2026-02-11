@@ -424,6 +424,7 @@ body {
 
 /* Sidebar user block for profile + logout */
 .sidebar .sidebar-user {
+    margin-top: auto;
     padding: 12px 20px;
     border-top: 1px solid #f0f2f5;
 }
