@@ -8,8 +8,6 @@ const Navbar = () => {
   const { user, logout, isAdmin } = useAuth();
   const pathname = usePathname();
 
-  if (!user) return null;
-
   const handleLogout = () => logout();
 
   return (
@@ -20,14 +18,23 @@ const Navbar = () => {
         </Link>
 
         <div className="nav-links">
-          <div className="user-info">
-            <span>Welcome, {user.name}</span>
-            <span className="user-role">{isAdmin() ? 'Admin' : 'User'}</span>
-          </div>
-
-          <button onClick={handleLogout} className="btn btn-danger">
-            Logout
-          </button>
+          {user ? (
+            <>
+              <div className="user-info">
+                <span>Welcome, {user.name}</span>
+                <span className="user-role">{isAdmin ? (isAdmin() ? 'Admin' : 'User') : 'User'}</span>
+              </div>
+              <button onClick={handleLogout} className="btn btn-danger">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="nav-link">Login</Link>
+              <Link href="/register" className="nav-link">Register</Link>
+              <Link href="/admin-login" className="nav-link">Admin</Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
