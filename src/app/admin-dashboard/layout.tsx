@@ -1,14 +1,15 @@
 "use client";
 import React from 'react';
-import Navbar from '../../components/Layout/Navbar';
 import AdminSidebar from '../../components/Layout/AdminSidebar';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
+  const { user, logout } = useAuth();
+
   return (
     <div className="admin-dashboard-container">
-      <Navbar />
       <div className="admin-dashboard">
-        <AdminSidebar />
+        <AdminSidebar user={user} onLogout={logout} />
         <main className="admin-main-content">{children}</main>
       </div>
     </div>

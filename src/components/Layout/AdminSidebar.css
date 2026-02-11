@@ -51,3 +51,31 @@
   font-size: 13px;
   color: var(--sidebar-muted, #94a3b8);
 }
+
+.admin-sidebar .sidebar-user {
+  padding: 12px 20px;
+  border-top: 1px solid rgba(255,255,255,0.03);
+}
+
+.admin-sidebar .user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-sidebar .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--admin-active-bg, #1e3a8a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+}
+
+.admin-sidebar .user-info { flex: 1; }
+.admin-sidebar .user-name { font-weight: 600; }
+.admin-sidebar .user-role { font-size: 12px; color: var(--sidebar-muted, #94a3b8); }
+.admin-sidebar .logout-btn { background: transparent; border: none; color: var(--sidebar-link, #cbd5e1); cursor: pointer; }
