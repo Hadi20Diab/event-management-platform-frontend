@@ -1,26 +1,23 @@
-/* Base wrapper reuses .sidebar base rules from page.css and overrides colors */
+/* Make admin sidebar visually consistent with user sidebar styles in page.css */
 .admin-sidebar {
   width: 220px;
-  background: var(--admin-sidebar-bg, #0f1724);
-  color: var(--admin-sidebar-color, #e6eef8);
+  background: white;
+  border-right: 1px solid #e9ecef;
+  padding: 30px 0;
   display: flex;
   flex-direction: column;
-  padding: 20px 0;
-  min-height: calc(100vh - var(--navbar-height, 64px));
+  min-height: calc(100vh);
 }
 
 .admin-sidebar .sidebar-brand {
   font-size: 18px;
   font-weight: 700;
-  color: var(--admin-brand-color, #fff);
+  color: var(--primary-color);
   padding: 0 20px 12px 20px;
 }
 
 .admin-sidebar .sidebar-nav {
   padding: 0 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .admin-sidebar .sidebar-link {
@@ -28,20 +25,19 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  color: var(--admin-link-color, #cbd5e1);
+  color: var(--dark-color);
   text-decoration: none;
-  border-radius: var(--border-radius, 8px);
+  border-radius: var(--border-radius);
   margin-bottom: 8px;
-  transition: var(--transition, all 150ms ease);
+  transition: var(--transition);
 }
 
 .admin-sidebar .sidebar-link:hover {
-  background-color: rgba(255,255,255,0.03);
-  color: #ffffff;
+  background-color: #f0f2f5;
 }
 
 .admin-sidebar .sidebar-link.active {
-  background-color: var(--admin-active-bg, #1e3a8a);
+  background-color: var(--primary-color);
   color: white;
 }
 
@@ -52,9 +48,10 @@
   color: var(--sidebar-muted, #94a3b8);
 }
 
+/* Profile / logout block (consistent with user sidebar) */
 .admin-sidebar .sidebar-user {
   padding: 12px 20px;
-  border-top: 1px solid rgba(255,255,255,0.03);
+  border-top: 1px solid #f0f2f5;
 }
 
 .admin-sidebar .user-row {
@@ -67,7 +64,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--admin-active-bg, #1e3a8a);
+  background: var(--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,4 +75,4 @@
 .admin-sidebar .user-info { flex: 1; }
 .admin-sidebar .user-name { font-weight: 600; }
 .admin-sidebar .user-role { font-size: 12px; color: var(--sidebar-muted, #94a3b8); }
-.admin-sidebar .logout-btn { background: transparent; border: none; color: var(--sidebar-link, #cbd5e1); cursor: pointer; }
+.admin-sidebar .logout-btn { background: transparent; border: none; color: var(--dark-color); cursor: pointer; }
