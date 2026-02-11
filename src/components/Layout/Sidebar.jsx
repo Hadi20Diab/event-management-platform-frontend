@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FaHome, FaCalendarAlt, FaList, FaUsersCog } from 'react-icons/fa';
 
-const Sidebar = ({ isAdmin }) => {
+const Sidebar = ({ user, onLogout }) => {
   const pathname = usePathname();
 
   const userLinks = [
@@ -13,17 +13,10 @@ const Sidebar = ({ isAdmin }) => {
     { to: '/dashboard/my-events', icon: <FaList />, label: 'My Events' },
   ];
 
-  const adminLinks = [
-    ...userLinks,
-    { to: '/admin/events', icon: <FaUsersCog />, label: 'Manage Events' },
-  ];
-
-  const links = isAdmin ? adminLinks : userLinks;
-
   return (
     <aside className="sidebar">
       <nav className="sidebar-nav">
-        {links.map((link) => (
+        {userLinks.map((link) => (
           <Link
             key={link.to}
             href={link.to}
@@ -34,6 +27,24 @@ const Sidebar = ({ isAdmin }) => {
           </Link>
         ))}
       </nav>
+
+      <div className="sidebar-user">
+        {user ? (
+          <div className="user-row">
+            <div className="avatar">{user.name ? user.name.charAt(0).toUpperCase() : 'U'}</div>
+            <div className="user-info">
+              <div className="user-name">{user.name}</div>
+            </div>
+            <button className="btn btn-ghost logout-btn" onClick={() => onLogout && onLogout()}>
+              Logout
+            </button>
+          </div>
+        ) : (
+          <div className="user-row">
+            <Link href="/login" className="sidebar-link">Login</Link>
+          </div>
+        )}
+      </div>
     </aside>
   );
 };

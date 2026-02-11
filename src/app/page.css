@@ -349,7 +349,7 @@ body {
 .dashboard, .admin-dashboard {
     display: grid;
     grid-template-columns: 250px 1fr;
-    min-height: calc(100vh - 70px);
+    min-height: calc(100vh);
 }
 
 .sidebar {
@@ -383,7 +383,7 @@ body {
     color: white;
 }
 
-.main-content {
+.main-content, .admin-main-content {
     padding: 30px;
 }
 
@@ -418,6 +418,35 @@ body {
     font-weight: 600;
     margin-bottom: 8px;
 }
+
+/* Sidebar user block for profile + logout */
+.sidebar .sidebar-user {
+    padding: 12px 20px;
+    border-top: 1px solid #f0f2f5;
+}
+
+.sidebar .user-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+}
+
+.sidebar .user-info { flex: 1; }
+.sidebar .user-name { font-weight: 600; }
+.sidebar .logout-btn { background: transparent; border: none; color: var(--dark-color); cursor: pointer; }
+
 
 .event-category {
     display: inline-block;

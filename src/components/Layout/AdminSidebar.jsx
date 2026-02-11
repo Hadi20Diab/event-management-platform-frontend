@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import './AdminSidebar.css';
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ user, onLogout }) {
   const pathname = usePathname();
 
   const items = [
@@ -24,6 +24,24 @@ export default function AdminSidebar() {
           </Link>
         ))}
       </nav>
+      <div className="sidebar-user">
+        {user ? (
+          <div className="user-row">
+            <div className="avatar">{user.name ? user.name.charAt(0).toUpperCase() : 'A'}</div>
+            <div className="user-info">
+              <div className="user-name">{user.name}</div>
+              <div className="user-role">Admin</div>
+            </div>
+            <button className="btn btn-ghost logout-btn" onClick={() => onLogout && onLogout()}>
+              Logout
+            </button>
+          </div>
+        ) : (
+          <div className="user-row">
+            <Link href="/admin-login" className="sidebar-link">Admin Login</Link>
+          </div>
+        )}
+      </div>
       <div className="sidebar-footer">Admin tools</div>
     </aside>
   );
