@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
+import '@/app/page.css'
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
