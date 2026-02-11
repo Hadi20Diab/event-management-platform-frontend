@@ -16,7 +16,7 @@ export default function AdminSidebar({ user, onLogout }) {
 
   return (
     <aside className="sidebar admin-sidebar">
-      <div className="sidebar-brand">Admin</div>
+      <div className="sidebar-brand">Admin Panel</div>
       <nav className="sidebar-nav">
         {items.map((it) => (
           <Link key={it.href + it.label} href={it.href} className={`sidebar-link ${pathname === it.href ? 'active' : ''}`}>

@@ -2,10 +2,13 @@
 /* Only override admin-specific elements (brand, footer) here */
 
 .admin-sidebar .sidebar-brand {
-  font-size: 18px;
-  font-weight: 700;
   color: var(--primary-color);
-  padding: 0 20px 12px 20px;
+  padding: 0 20px;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 1px solid #80808073;
+  margin-bottom: 10px;
 }
 
 .admin-sidebar .sidebar-footer {
