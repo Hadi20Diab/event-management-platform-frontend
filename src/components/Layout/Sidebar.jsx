@@ -1,10 +1,14 @@
+"use client";
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { FaHome, FaCalendarAlt, FaList, FaUsersCog } from 'react-icons/fa';
 
 const Sidebar = () => {
   const { isAdmin } = useAuth();
+
+  const pathname = usePathname();
 
   const userLinks = [
     { to: '/dashboard', icon: <FaHome />, label: 'Dashboard' },
@@ -23,16 +27,14 @@ const Sidebar = () => {
     <aside className="sidebar">
       <nav className="sidebar-nav">
         {links.map((link) => (
-          <NavLink
+          <Link
             key={link.to}
-            to={link.to}
-            className={({ isActive }) => 
-              `sidebar-link ${isActive ? 'active' : ''}`
-            }
+            href={link.to}
+            className={`sidebar-link ${pathname === link.to ? 'active' : ''}`}
           >
             {link.icon}
             <span>{link.label}</span>
-          </NavLink>
+          </Link>
         ))}
       </nav>
     </aside>
