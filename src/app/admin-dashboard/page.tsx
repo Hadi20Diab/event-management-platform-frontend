@@ -5,6 +5,7 @@ import Sidebar from '../../components/Layout/Sidebar';
 import EventForm from '../../components/Events/EventForm';
 import EventCard from '../../components/Events/EventCard';
 import { useAuth } from '../../context/AuthContext';
+import '@/app/page.css';
 
 const initialEvents = [
   {
