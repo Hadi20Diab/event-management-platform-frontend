@@ -64,7 +64,7 @@ export default function Dashboard() {
               ))}
             </div>
             <div style={{ marginTop: '20px', textAlign: 'center' }}>
-              <a href="/events" className="btn btn-primary">View All Events</a>
+              <a href="/dashboard/events" className="btn btn-primary">View All Events</a>
             </div>
           </div>
         </main>

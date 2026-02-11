@@ -1,10 +1,11 @@
+"use client";
 import React from 'react';
-import Navbar from '../components/Layout/Navbar';
-import Sidebar from '../components/Layout/Sidebar';
-import EventCard from '../components/Events/EventCard';
-import { useAuth } from '../context/AuthContext';
+import Navbar from '../../../components/Layout/Navbar';
+import Sidebar from '../../../components/Layout/Sidebar';
+import EventCard from '../../../components/Events/EventCard';
+import { useAuth } from '../../../context/AuthContext';
+import '@/app/page.css';
 
-// Mock data - Replace with API data
 const mockEvents = [
   {
     id: 1,
@@ -34,11 +35,10 @@ const mockEvents = [
   }
 ];
 
-const MyEvents = () => {
+export default function MyEvents() {
   const { user } = useAuth();
 
-  const handleUnregister = (eventId) => {
-    // TODO: Replace with API call
+  const handleUnregister = (eventId: any) => {
     console.log('Unregistering from event:', eventId);
     alert(`Unregistered from event ${eventId} (Mock - Replace with API call)`);
   };
@@ -64,15 +64,10 @@ const MyEvents = () => {
             <>
               <div className="events-grid">
                 {mockEvents.map((event) => (
-                  <EventCard
-                    key={event.id}
-                    event={event}
-                    onUnregister={handleUnregister}
-                    isRegistered={true}
-                  />
+                  <EventCard key={event.id} event={event} onUnregister={handleUnregister} isRegistered={true} onRegister={undefined} />
                 ))}
               </div>
-              
+
               <div style={{ marginTop: '30px', textAlign: 'center' }}>
                 <p>Showing {mockEvents.length} registered events</p>
               </div>
@@ -82,6 +77,4 @@ const MyEvents = () => {
       </div>
     </div>
   );
-};
-
-export default MyEvents;
+}

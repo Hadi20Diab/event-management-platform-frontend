@@ -12,8 +12,8 @@ const Sidebar = () => {
 
   const userLinks = [
     { to: '/dashboard', icon: <FaHome />, label: 'Dashboard' },
-    { to: '/events', icon: <FaCalendarAlt />, label: 'All Events' },
-    { to: '/my-events', icon: <FaList />, label: 'My Events' },
+    { to: '/dashboard/events', icon: <FaCalendarAlt />, label: 'All Events' },
+    { to: '/dashboard/my-events', icon: <FaList />, label: 'My Events' },
   ];
 
   const adminLinks = [
