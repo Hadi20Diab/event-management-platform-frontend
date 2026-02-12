@@ -1,17 +1,23 @@
 "use client";
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { FaHome, FaCalendarAlt, FaList, FaUsersCog } from 'react-icons/fa';
+import React from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { FaHome, FaCalendarAlt, FaList, FaUsersCog } from "react-icons/fa";
 
 const Sidebar = ({ user, onLogout }) => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const userLinks = [
-    { to: '/dashboard', icon: <FaHome />, label: 'Dashboard' },
-    { to: '/dashboard/events', icon: <FaCalendarAlt />, label: 'All Events' },
-    { to: '/dashboard/my-events', icon: <FaList />, label: 'My Events' },
+    { to: "/dashboard", icon: <FaHome />, label: "Dashboard" },
+    { to: "/dashboard/events", icon: <FaCalendarAlt />, label: "All Events" },
+    { to: "/dashboard/my-events", icon: <FaList />, label: "My Events" },
   ];
+
+  const handleLogout = () => {
+    if (onLogout) onLogout();
+    router.push("/");
+  };
 
   return (
     <aside className="sidebar">
@@ -20,7 +26,7 @@ const Sidebar = ({ user, onLogout }) => {
           <Link
             key={link.to}
             href={link.to}
-            className={`sidebar-link ${pathname === link.to ? 'active' : ''}`}
+            className={`sidebar-link ${pathname === link.to ? "active" : ""}`}
           >
             {link.icon}
             <span>{link.label}</span>
@@ -31,17 +37,21 @@ const Sidebar = ({ user, onLogout }) => {
       <div className="sidebar-user">
         {user ? (
           <div className="user-row">
-            <div className="avatar">{user.name ? user.name.charAt(0).toUpperCase() : 'U'}</div>
+            <div className="avatar">
+              {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+            </div>
             <div className="user-info">
               <div className="user-name">{user.name}</div>
             </div>
-            <button className="btn btn-ghost logout-btn" onClick={() => onLogout && onLogout()}>
+            <button className="btn btn-ghost logout-btn" onClick={handleLogout}>
               Logout
             </button>
           </div>
         ) : (
           <div className="user-row">
-            <Link href="/login" className="sidebar-link">Login</Link>
+            <Link href="/login" className="sidebar-link">
+              Login
+            </Link>
           </div>
         )}
       </div>
