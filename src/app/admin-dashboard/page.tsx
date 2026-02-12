@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from "../../context/AuthContext";
 import "@/app/page.css";
 
 export default function AdminDashboardPage() {
@@ -46,33 +46,33 @@ export default function AdminDashboardPage() {
         <div className="events-grid">
           <div className="event-card">
             <div className="event-body">
-              <p>Create and manage events easily.</p>
-              <a href="/admin-dashboard/Manage-Events">
-                <button className="btn btn-primary">
-                  Go to Events
-                </button>
+              <p style={{ marginBottom: "15px" }}>
+                Create and manage events easily.
+              </p>
+              <a href="/admin-dashboard/manage-events">
+                <button className="btn btn-primary">Go to Events</button>
               </a>
             </div>
           </div>
 
           <div className="event-card">
             <div className="event-body">
-              <p>View and manage system users.</p>
-              <a href="/admin-dashboard/Users">
-                <button className="btn btn-primary">
-                  Manage Users
-                </button>
+              <p style={{ marginBottom: "15px" }}>
+                View and manage system users.
+              </p>
+              <a href="/admin-dashboard/users">
+                <button className="btn btn-primary">Manage Users</button>
               </a>
             </div>
           </div>
 
           <div className="event-card">
             <div className="event-body">
-              <p>Check reports and analytics.</p>
-              <a href="/admin-dashboard/Reports">
-                <button className="btn btn-primary">
-                  View Reports
-                </button>
+              <p style={{ marginBottom: "15px" }}>
+                Check reports and analytics.
+              </p>
+              <a href="/admin-dashboard/reports">
+                <button className="btn btn-primary">View Reports</button>
               </a>
             </div>
           </div>

@@ -7,22 +7,22 @@ const initialAdmins = [
     id: 1,
     name: "Alice Johnson",
     email: "alice@admin.com",
+    phone: "11111111",
     role: "superAdmin",
-    status: "active",
   },
   {
     id: 2,
     name: "Bob Smith",
     email: "bob@admin.com",
+    phone: "222222222",
     role: "admin",
-    status: "active",
   },
   {
     id: 3,
     name: "Charlie Brown",
     email: "charlie@admin.com",
+    phone: "33333333",
     role: "admin",
-    status: "inactive",
   },
 ];
 
@@ -81,25 +81,11 @@ export default function ManageAdminsPage() {
           <div key={admin.id} className="event-card">
             <div className="event-header">
               <h3 className="event-title">{admin.name}</h3>
-              <span
-                style={{
-                  float: "right",
-                  background:
-                    admin.status === "active"
-                      ? "var(--success-color)"
-                      : "var(--danger-color)",
-                  color: "white",
-                  padding: "4px 8px",
-                  borderRadius: "4px",
-                  fontSize: "12px",
-                }}
-              >
-                {admin.status}
-              </span>
             </div>
 
             <div className="event-body">
               <p>Email: {admin.email}</p>
+              <p>Phone Number: {admin.phone}</p>
               <p>Role: {admin.role}</p>
             </div>
 

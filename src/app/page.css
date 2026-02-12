@@ -404,6 +404,15 @@ body {
     display: block;
 }
 
+.btn-view {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.btn-view:hover {
+    background-color: #e68a00;
+}
+
 .btn-danger {
     background-color: var(--danger-color);
     color: white;
@@ -568,6 +577,12 @@ body {
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 8px;
+}
+
+.registered-events {
+  max-height: 150px; /* limit expansion */
+  overflow-y: auto; /* scroll if too many events */
+  margin-top: 10px;
 }
 
 /* Sidebar user block for profile + logout */

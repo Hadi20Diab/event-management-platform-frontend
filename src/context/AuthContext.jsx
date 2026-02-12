@@ -1,11 +1,15 @@
+"use client";
+
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
+
 /**
  * @typedef {Object} AuthUser
  * @property {number|string} id
  * @property {string} email
  * @property {string} name
- * @property {string} role
+ * @property {string|undefined} role
+ * @property {string|undefined} phone
  * @property {Array<number>} registeredEvents
  *
  * @typedef {Object} AuthContextType
@@ -13,17 +17,15 @@ import { useRouter } from "next/navigation";
  * @property {boolean} loading
  * @property {(email:string, password:string) => Promise<any>} login
  * @property {(userData:Object) => Promise<any>} register
+ * @property {(updatedData:Object) => void} updateProfile
  * @property {() => void} logout
  * @property {() => boolean} isAdmin
  * @property {() => boolean} isSuperAdmin
  */
 
-/** @type {React.Context<AuthContextType>} */
-const AuthContext = createContext(/** @type {AuthContextType} */ ({}));
+const AuthContext = createContext({});
 
-/** @returns {AuthContextType} */
-export const useAuth = () =>
-  /** @type {AuthContextType} */ (useContext(AuthContext));
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -31,7 +33,6 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // Check for stored token on mount
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
 
@@ -46,10 +47,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  // ================= LOGIN =================
   const login = async (email, password) => {
     console.log("Logging in with:", email, password);
 
-    // Mock response - Replace with actual API call
     const mockResponse = {
       token: "mock-jwt-token",
       user: {
@@ -60,7 +61,8 @@ export const AuthProvider = ({ children }) => {
           ? "superAdmin"
           : email.includes("admin")
             ? "admin"
-            : undefined, // normal user has no role
+            : undefined,
+        phone: "",
         registeredEvents: [1, 2],
       },
     };
@@ -72,6 +74,7 @@ export const AuthProvider = ({ children }) => {
     return { success: true, data: mockResponse };
   };
 
+  // ================= REGISTER =================
   const register = async (userData) => {
     console.log("Registering:", userData);
 
@@ -80,7 +83,8 @@ export const AuthProvider = ({ children }) => {
       user: {
         id: Date.now(),
         ...userData,
-        role: undefined, // normal users have no role
+        role: undefined,
+        phone: userData.phone || "",
         registeredEvents: [],
       },
     };
@@ -92,6 +96,20 @@ export const AuthProvider = ({ children }) => {
     return { success: true, data: mockResponse };
   };
 
+  // ================= UPDATE PROFILE =================
+  const updateProfile = (updatedData) => {
+    if (!user) return;
+
+    const updatedUser = {
+      ...user,
+      ...updatedData,
+    };
+
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  };
+
+  // ================= LOGOUT =================
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -99,12 +117,11 @@ export const AuthProvider = ({ children }) => {
     router.push("/");
   };
 
-  // Checks if the user is admin OR superAdmin
+  // ================= ROLE CHECKS =================
   const isAdmin = () => {
     return user?.role === "admin" || user?.role === "superAdmin";
   };
 
-  // Checks if the user is superAdmin
   const isSuperAdmin = () => {
     return user?.role === "superAdmin";
   };
@@ -114,6 +131,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    updateProfile,
     logout,
     isAdmin,
     isSuperAdmin,

@@ -31,12 +31,14 @@ const Sidebar = ({ user, onLogout }) => {
       <div className="sidebar-user">
         {user ? (
           <div className="user-row">
-            <div className="avatar">
-              {user.name ? user.name.charAt(0).toUpperCase() : "U"}
-            </div>
-            <div className="user-info">
-              <div className="user-name">{user.name}</div>
-            </div>
+            <Link href="/dashboard/profile" className="profile-link">
+              <div className="avatar">
+                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+              </div>
+              <div className="user-info">
+                <div className="user-name">{user.name}</div>
+              </div>
+            </Link>
             <button
               className="btn btn-ghost logout-btn"
               onClick={() => onLogout && onLogout()}

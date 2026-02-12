@@ -18,10 +18,18 @@ export default function AdminSidebar({ user, onLogout }) {
 
   // Default sidebar items
   const items = [
-    { href: '/admin-dashboard', label: 'Dashboard', icon: <FaTachometerAlt /> },
-    { href: '/admin-dashboard/manage-events', label: 'Manage Events', icon: <FaCalendarAlt /> },
-    { href: '/admin-dashboard/users', label: 'Users', icon: <FaUsers /> },
-    { href: '/admin-dashboard/reports', label: 'Reports', icon: <FaChartBar /> },
+    { href: "/admin-dashboard", label: "Dashboard", icon: <FaTachometerAlt /> },
+    {
+      href: "/admin-dashboard/manage-events",
+      label: "Manage Events",
+      icon: <FaCalendarAlt />,
+    },
+    { href: "/admin-dashboard/users", label: "Users", icon: <FaUsers /> },
+    {
+      href: "/admin-dashboard/reports",
+      label: "Reports",
+      icon: <FaChartBar />,
+    },
   ];
 
   // If superAdmin, add Manage Admins link
@@ -53,15 +61,18 @@ export default function AdminSidebar({ user, onLogout }) {
       <div className="sidebar-footer">
         {user ? (
           <div className="user-row">
-            <div className="avatar">
-              {user.name ? user.name.charAt(0).toUpperCase() : "A"}
-            </div>
-            <div className="user-info">
-              <div className="user-name">{user.name}</div>
-              <div className="user-role">
-                {isSuperAdmin() ? "Super Admin" : "Admin"}
+            <Link href="/admin-dashboard/profile" className="profile-link">
+              <div className="avatar">
+                {user.name ? user.name.charAt(0).toUpperCase() : "A"}
               </div>
-            </div>
+              <div className="user-info">
+                <div className="user-name">{user.name}</div>
+                <div className="user-role">
+                  {isSuperAdmin() ? "Super Admin" : "Admin"}
+                </div>
+              </div>
+            </Link>
+
             <button
               className="btn btn-ghost logout-btn"
               onClick={() => onLogout && onLogout()}
