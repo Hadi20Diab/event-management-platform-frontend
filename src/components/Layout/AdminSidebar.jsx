@@ -18,10 +18,10 @@ export default function AdminSidebar({ user, onLogout }) {
 
   // Default sidebar items
   const items = [
-    { href: '/admin-dashboard/Dashboard', label: 'Dashboard', icon: <FaTachometerAlt /> },
-    { href: '/admin-dashboard/Manage-Events', label: 'Manage Events', icon: <FaCalendarAlt /> },
-    { href: '/admin-dashboard/Users', label: 'Users', icon: <FaUsers /> },
-    { href: '/admin-dashboard/Reports', label: 'Reports', icon: <FaChartBar /> },
+    { href: '/admin-dashboard/dashboard', label: 'Dashboard', icon: <FaTachometerAlt /> },
+    { href: '/admin-dashboard/manage-events', label: 'Manage Events', icon: <FaCalendarAlt /> },
+    { href: '/admin-dashboard/users', label: 'Users', icon: <FaUsers /> },
+    { href: '/admin-dashboard/reports', label: 'Reports', icon: <FaChartBar /> },
   ];
 
   // If superAdmin, add Manage Admins link
