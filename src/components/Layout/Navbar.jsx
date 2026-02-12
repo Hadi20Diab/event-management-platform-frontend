@@ -30,9 +30,9 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link href="/login" className="nav-link">Login</Link>
-              <Link href="/register" className="nav-link">Register</Link>
-              <Link href="/admin-login" className="nav-link">Admin</Link>
+              <Link href="/login" className={`nav-link ${pathname === '/login' ? 'active' : ''}`}>Login</Link>
+              <Link href="/register" className={`nav-link ${pathname === '/register' ? 'active' : ''}`}>Register</Link>
+              <Link href="/admin-login" className={`nav-link ${pathname === '/admin-login' ? 'active' : ''}`}>Admin</Link>
             </>
           )}
         </div>
