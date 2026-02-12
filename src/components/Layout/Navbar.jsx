@@ -5,10 +5,17 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, isSuperAdmin } = useAuth();
   const pathname = usePathname();
 
   const handleLogout = () => logout();
+
+  // Determine the role label for display
+  const getRoleLabel = () => {
+    if (isSuperAdmin()) return "Super Admin";
+    if (isAdmin()) return "Admin";
+    return "User";
+  };
 
   return (
     <nav className="navbar">
@@ -22,7 +29,7 @@ const Navbar = () => {
             <>
               <div className="user-info">
                 <span>Welcome, {user.name}</span>
-                <span className="user-role">{isAdmin ? (isAdmin() ? 'Admin' : 'User') : 'User'}</span>
+                <span className="user-role">{getRoleLabel()}</span>
               </div>
               <button onClick={handleLogout} className="btn btn-danger">
                 Logout
@@ -30,9 +37,24 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link href="/login" className={`nav-link ${pathname === '/login' ? 'active' : ''}`}>Login</Link>
-              <Link href="/register" className={`nav-link ${pathname === '/register' ? 'active' : ''}`}>Register</Link>
-              <Link href="/admin-login" className={`nav-link ${pathname === '/admin-login' ? 'active' : ''}`}>Admin</Link>
+              <Link
+                href="/login"
+                className={`nav-link ${pathname === '/login' ? 'active' : ''}`}
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className={`nav-link ${pathname === '/register' ? 'active' : ''}`}
+              >
+                Register
+              </Link>
+              <Link
+                href="/admin-login"
+                className={`nav-link ${pathname === '/admin-login' ? 'active' : ''}`}
+              >
+                Admin
+              </Link>
             </>
           )}
         </div>

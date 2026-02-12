@@ -1,23 +1,17 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { FaHome, FaCalendarAlt, FaList, FaUsersCog } from "react-icons/fa";
 
 const Sidebar = ({ user, onLogout }) => {
   const pathname = usePathname();
-  const router = useRouter();
 
   const userLinks = [
     { to: "/dashboard", icon: <FaHome />, label: "Dashboard" },
     { to: "/dashboard/events", icon: <FaCalendarAlt />, label: "All Events" },
     { to: "/dashboard/my-events", icon: <FaList />, label: "My Events" },
   ];
-
-  const handleLogout = () => {
-    if (onLogout) onLogout();
-    router.push("/");
-  };
 
   return (
     <aside className="sidebar">
@@ -43,7 +37,10 @@ const Sidebar = ({ user, onLogout }) => {
             <div className="user-info">
               <div className="user-name">{user.name}</div>
             </div>
-            <button className="btn btn-ghost logout-btn" onClick={handleLogout}>
+            <button
+              className="btn btn-ghost logout-btn"
+              onClick={() => onLogout && onLogout()}
+            >
               Logout
             </button>
           </div>

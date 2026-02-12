@@ -1,10 +1,29 @@
 "use client";
-import React from 'react';
-import Sidebar from '@/components/Layout/Sidebar';
-import { useAuth } from '@/context/AuthContext';
+import React, { useEffect } from "react";
+import Sidebar from "@/components/Layout/Sidebar";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth();
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, logout, isAdmin } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    if (isAdmin()) {
+      router.push("/admin-dashboard");
+    }
+  }, [user, isAdmin, router]);
+
+  if (!user || isAdmin()) return null;
 
   return (
     <div className="dashboard-container">
