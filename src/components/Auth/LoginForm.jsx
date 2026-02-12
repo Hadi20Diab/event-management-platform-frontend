@@ -1,11 +1,12 @@
+"use client";
 import { useState } from "react";
 import { apiRequest } from "../../api/api";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const submit = async (e) => {
     e.preventDefault();
@@ -15,7 +16,7 @@ export default function Login() {
       const data = await apiRequest("/auth/login", "POST", form);
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.user.role); // admin / user
-      navigate("/dashboard");
+      router.push('/dashboard');
     } catch (err) {
       setError(err.message);
     }

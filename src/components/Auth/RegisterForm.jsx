@@ -1,11 +1,12 @@
+"use client";
 import { useState } from "react";
 import { apiRequest } from "../../api/api";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/navigation';
 
 export default function Register() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const submit = async (e) => {
     e.preventDefault();
@@ -13,7 +14,7 @@ export default function Register() {
 
     try {
       await apiRequest("/auth/register", "POST", form);
-      navigate("/login");
+      router.push('/login');
     } catch (err) {
       setError(err.message);
     }
