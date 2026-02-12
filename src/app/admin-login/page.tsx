@@ -19,6 +19,11 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
+      if (typeof login !== 'function') {
+        setError('Login is not available. Please try again later.');
+        return;
+      }
+
       const result = await login(email, password);
       if (result.success && result.data?.user?.role === 'admin') {
         router.push('/admin-dashboard');
