@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import "@/app/page.css";
 
 export default function AdminDashboardPage() {

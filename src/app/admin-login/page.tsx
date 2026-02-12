@@ -27,7 +27,7 @@ export default function AdminLogin() {
       const result = await login(email, password);
       const role = result?.data?.user?.role;
       if (result.success && (role === "admin" || role === "superAdmin")) {
-        router.push("/admin-dashboard/dashboard");
+        router.push("/admin-dashboard");
       } else {
         setError("Admin credentials required");
       }
