@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import '@/app/page.css'
+import Navbar from '@/components/Layout/Navbar';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -34,57 +35,60 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h1 className="auth-title">Event Management</h1>
-        <h2 className="auth-title">Login</h2>
+    <>
+      <Navbar />
 
-        {error && (
-          <div className="alert alert-error">{error}</div>
-        )}
+      <div className="auth-container">
+        <div className="auth-card">
+          <h2 className="auth-title">Login</h2>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-            />
+          {error && (
+            <div className="alert alert-error">{error}</div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+          </form>
+
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <p>
+              Don't have an account?{' '}
+              <Link href="/register" style={{ color: 'var(--primary-color)' }}>
+                Register here
+              </Link>
+            </p>
+            <p style={{ marginTop: '10px', fontSize: '14px', color: 'var(--gray-color)' }}>
+              Try: admin@test.com / user@test.com (password: any)
+            </p>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-
-        <div style={{ marginTop: '20px', textAlign: 'center' }}>
-          <p>
-            Don't have an account?{' '}
-            <Link href="/register" style={{ color: 'var(--primary-color)' }}>
-              Register here
-            </Link>
-          </p>
-          <p style={{ marginTop: '10px', fontSize: '14px', color: 'var(--gray-color)' }}>
-            Try: admin@test.com / user@test.com (password: any)
-          </p>
         </div>
       </div>
-    </div>
+    </>
   );
 }
