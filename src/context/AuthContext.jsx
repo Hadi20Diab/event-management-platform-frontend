@@ -2,13 +2,15 @@
 
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import bcrypt from "bcryptjs";
+import api from "@/lib/apiClient";
 
 /**
  * @typedef {Object} AuthUser
  * @property {number|string} id
  * @property {string} email
  * @property {string} name
- * @property {string|undefined} role
+ * @property {string} role
  * @property {string|undefined} phone
  * @property {Array<number>} registeredEvents
  *
@@ -39,6 +41,7 @@ export const AuthProvider = ({ children }) => {
     if (token && storedUser) {
       try {
         setUser(JSON.parse(storedUser));
+        api.setToken(token);
       } catch (error) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -49,51 +52,83 @@ export const AuthProvider = ({ children }) => {
 
   // ================= LOGIN =================
   const login = async (email, password) => {
-    console.log("Logging in with:", email, password);
+    setLoading(true);
+    try {
+      const saltRounds = parseInt(
+        process.env.NEXT_APP_SALT_ROUNDS || process.env.NEXT_PUBLIC_SALT_ROUNDS || "10",
+        10
+      );
 
-    const mockResponse = {
-      token: "mock-jwt-token",
-      user: {
-        id: Date.now(),
+      // By default this project expects a bcrypt hash on the backend.
+      const hashed = await bcrypt.hash(password, saltRounds);
+
+      const res = await api.post("/api/auth/user/signin", {
         email,
-        name: email.split("@")[0],
-        role: email.includes("superadmin")
-          ? "superAdmin"
-          : email.includes("admin")
-            ? "admin"
-            : undefined,
-        phone: "",
-        registeredEvents: [1, 2],
-      },
-    };
+        password: hashed,
+      });
 
-    localStorage.setItem("token", mockResponse.token);
-    localStorage.setItem("user", JSON.stringify(mockResponse.user));
-    setUser(mockResponse.user);
+      const token = res?.token || res?.data?.token;
+      const userResp = res?.user || res?.data?.user || res?.data;
 
-    return { success: true, data: mockResponse };
+      if (token) {
+        api.setToken(token);
+        try {
+          localStorage.setItem("token", token);
+          localStorage.setItem("user", JSON.stringify(userResp));
+        } catch (e) {}
+        setUser(userResp);
+        return { success: true, data: { token, user: userResp } };
+      }
+
+      return { success: false, message: res?.message || "Login failed" };
+    } catch (err) {
+      console.error("Login error:", err);
+      return { success: false, message: err?.data?.message || err.message || "Login error" };
+    } finally {
+      setLoading(false);
+    }
   };
 
   // ================= REGISTER =================
   const register = async (userData) => {
-    console.log("Registering:", userData);
+    setLoading(true);
+    try {
+      const saltRounds = parseInt(
+        process.env.NEXT_APP_SALT_ROUNDS || process.env.NEXT_PUBLIC_SALT_ROUNDS || "10",
+        10
+      );
 
-    const mockResponse = {
-      token: "mock-jwt-token",
-      user: {
-        id: Date.now(),
-        ...userData,
-        role: undefined,
-        phone: userData.phone || "",
-        registeredEvents: [],
-      },
-    };
+      const hashed = await bcrypt.hash(userData.password, saltRounds);
 
-    localStorage.setItem("token", mockResponse.token);
-    localStorage.setItem("user", JSON.stringify(mockResponse.user));
-    setUser(mockResponse.user);
+      const payload = {
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        password: hashed,
+      };
 
-    return { success: true, data: mockResponse };
+      const res = await api.post("/api/users", payload);
+
+      const token = res?.token || res?.data?.token;
+      const userResp = res?.user || res?.data?.user || res?.data;
+
+      if (token) {
+        api.setToken(token);
+        try {
+          localStorage.setItem("token", token);
+          localStorage.setItem("user", JSON.stringify(userResp));
+        } catch (e) {}
+        setUser(userResp);
+        return { success: true, data: { token, user: userResp } };
+      }
+
+      return { success: false, message: res?.message || "Registration failed" };
+    } catch (err) {
+      console.error("Registration error:", err);
+      return { success: false, message: err?.data?.message || err.message || "Registration error" };
+    } finally {
+      setLoading(false);
+    }
   };
 
   // ================= UPDATE PROFILE =================
@@ -111,8 +146,7 @@ export const AuthProvider = ({ children }) => {
 
   // ================= LOGOUT =================
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    api.clearToken();
     setUser(null);
     router.push("/");
   };
