@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function ProfileForm() {
   const { user, updateProfile } = useAuth();
+  const isAdminType = user?.role === "admin" || user?.role === "superAdmin";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -43,43 +44,55 @@ export default function ProfileForm() {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setMessage("");
 
-    // Phone validation
-    if (!formData.phone) {
-      return setError("Phone number is required");
-    }
-    if (formData.phone.length < 8 || formData.phone.length > 15) {
-      return setError("Phone number must be between 8 and 15 digits");
+    if (!user) return;
+
+    const isAdminType = user.role === "admin" || user.role === "superAdmin";
+
+    // Phone validation (ONLY for admin/superAdmin)
+    if (isAdminType) {
+
+      if (formData.phone && (formData.phone.length < 8 || formData.phone.length > 15)) {
+        return setError("Phone number must be between 8 and 15 digits");
+      }
     }
 
-    // Password validation (only if user wants to change password)
+    // Password validation
     if (formData.password) {
       if (formData.password.length < 6) {
         return setError("Password must be at least 6 characters");
       }
+
       if (formData.password !== formData.confirmPassword) {
         return setError("Passwords do not match");
       }
     }
 
-    // Prepare updated data
     const updatedData = {
       name: formData.name,
       email: formData.email,
-      phone: formData.phone,
     };
+
+    // Only include phone if admin/superAdmin
+    if (isAdminType) {
+      updatedData.phone = formData.phone;
+    }
 
     if (formData.password) {
       updatedData.password = formData.password;
     }
 
-    // Call updateProfile (mock or real)
-    updateProfile(updatedData);
-    setMessage("Profile updated successfully");
+    try {
+      await updateProfile(updatedData);
+      setMessage("Profile updated successfully");
+    } catch (err) {
+      console.log(err);
+      setError(err.message);
+    }
   };
 
   return (
@@ -108,16 +121,17 @@ export default function ProfileForm() {
         />
       </div>
 
-      <div className="form-group">
-        <label>Phone</label>
-        <input
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          placeholder="8–15 digits"
-          required
-        />
-      </div>
+      {isAdminType && (
+        <div className="form-group">
+          <label>Phone</label>
+          <input
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="8–15 digits"
+          />
+        </div>
+      )}
 
       <hr style={{ margin: "20px 0" }} />
 

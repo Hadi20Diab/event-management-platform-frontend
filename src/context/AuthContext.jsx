@@ -58,7 +58,8 @@ export const AuthProvider = ({ children }) => {
       const hashedPassword = await hashPassword(password);
 
       // Determine if this is admin or user login based on email or role context
-      const isAdminLogin = email.includes("admin") || window.location.pathname === "/admin-login";
+      const isAdminLogin =
+        email.includes("admin") || window.location.pathname === "/admin-login";
       const endpoint = isAdminLogin ? "/auth/admin/login" : "/auth/user/signin";
 
       // Send SHA256 hash - backend will bcrypt it for secure storage
@@ -78,7 +79,8 @@ export const AuthProvider = ({ children }) => {
       console.error("Login error:", error);
       return {
         success: false,
-        message: error.message || "Login failed. Please check your credentials.",
+        message:
+          error.message || "Login failed. Please check your credentials.",
       };
     }
   };
@@ -116,16 +118,26 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ================= UPDATE PROFILE =================
-  const updateProfile = (updatedData) => {
+  const updateProfile = async (updatedData) => {
     if (!user) return;
 
-    const updatedUser = {
-      ...user,
-      ...updatedData,
-    };
+    try {
+      const isAdmin = user.role === "admin" || user.role === "superAdmin";
 
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setUser(updatedUser);
+      const endpoint = isAdmin ? `/admins/${user._id}` : `/users/${user._id}`;
+
+      const response = await apiRequest(endpoint, "PUT", updatedData);
+
+      const updatedUser = response.admin || response.user;
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+
+      return { success: true };
+    } catch (error) {
+      console.error("Update profile error:", error);
+      throw error;
+    }
   };
 
   // ================= LOGOUT =================
@@ -136,7 +148,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Logout error:", error);
     }
-    
+
     // Clear user data from localStorage
     localStorage.removeItem("user");
     setUser(null);
