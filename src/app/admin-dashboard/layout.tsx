@@ -9,7 +9,7 @@ export default function AdminDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, logout, isAdmin, loading } = useAuth();
+  const { user, logout, isAdmin, loading } = useAuth() as any;
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 

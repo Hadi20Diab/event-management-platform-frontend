@@ -10,7 +10,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login, user, isAdmin } = useAuth();
+  const { login, user, isAdmin } = useAuth() as any;
   const router = useRouter();
 
   // Auto-redirect if already logged in as admin
@@ -20,7 +20,7 @@ export default function AdminLogin() {
     }
   }, [user, isAdmin, router]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setLoading(true);

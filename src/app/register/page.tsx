@@ -17,7 +17,7 @@ export default function Register() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { register, user } = useAuth();
+  const { register, user } = useAuth() as any;
   const router = useRouter();
 
   // Auto-redirect if already logged in
@@ -27,7 +27,7 @@ export default function Register() {
     }
   }, [user, router]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     const { id, value } = e.target;
 
     if (id === "phone") {
@@ -44,7 +44,7 @@ export default function Register() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 

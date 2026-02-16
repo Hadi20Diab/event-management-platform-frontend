@@ -5,7 +5,7 @@ import { FaCalendarCheck, FaMusic, FaTheaterMasks } from 'react-icons/fa';
 import '@/app/page.css';
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user } = useAuth() as any;
 
   const stats = {
     totalEvents: 15,

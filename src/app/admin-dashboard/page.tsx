@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { apiRequest } from "../../api/api";
+import { useAuth } from "@/context/AuthContext";
+import { apiRequest } from "@/api/api";
 import "@/app/page.css";
 
 interface DashboardStats {
@@ -19,7 +19,7 @@ interface DashboardStats {
 }
 
 export default function AdminDashboardPage() {
-  const { user } = useAuth();
+  const { user } = useAuth() as any;
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
