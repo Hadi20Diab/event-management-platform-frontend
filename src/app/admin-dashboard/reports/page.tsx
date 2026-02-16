@@ -1,19 +1,34 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { apiRequest } from "../../../api/api";
 import "@/app/page.css";
 
 export default function ReportsPage() {
-  const reportData = {
-    totalRevenue: "12,430",
-    totalTicketsSold: 4285,
-    totalEvents: 12,
-    activeUsers: 248,
-  };
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<any>(null);
 
-  const topEvents = [
-    { id: 1, title: "Summer Music Festival", revenue: 7500 },
-    { id: 2, title: "React Masterclass", revenue: 4930 },
-  ];
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setLoading(true);
+        const res = await apiRequest("/reports");
+        const payload = res?.data || res;
+        setData(payload);
+      } catch (err: any) {
+        setError(err.message || "Failed to load reports");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReports();
+  }, []);
+
+  if (loading) return <div>Loading reports...</div>;
+  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
+
+  const reportData = data || {};
+  const topEvents = reportData.topEvents || [];
 
   return (
     <section className="admin-dashboard-container">
@@ -24,51 +39,57 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {/* Summary Cards */}
       <div className="events-grid">
         <div className="event-card">
           <div className="event-body">
             <h3>Total Revenue</h3>
-            <h2>${reportData.totalRevenue}</h2>
+            <h2>${reportData.totalRevenue ?? "0"}</h2>
           </div>
         </div>
 
         <div className="event-card">
           <div className="event-body">
             <h3>Tickets Sold</h3>
-            <h2>{reportData.totalTicketsSold}</h2>
+            <h2>{reportData.totalTicketsSold ?? 0}</h2>
           </div>
         </div>
 
         <div className="event-card">
           <div className="event-body">
             <h3>Total Events</h3>
-            <h2>{reportData.totalEvents}</h2>
+            <h2>{reportData.totalEvents ?? 0}</h2>
           </div>
         </div>
 
         <div className="event-card">
           <div className="event-body">
             <h3>Active Users</h3>
-            <h2>{reportData.activeUsers}</h2>
+            <h2>{reportData.activeUsers ?? 0}</h2>
           </div>
         </div>
       </div>
 
-      {/* Top Events */}
       <div style={{ marginTop: "40px" }}>
         <h2 style={{ marginBottom: "20px" }}>Top Performing Events</h2>
 
         <div className="events-grid">
-          {topEvents.map((event) => (
-            <div key={event.id} className="event-card">
+          {topEvents.length === 0 ? (
+            <div className="event-card">
               <div className="event-body">
-                <h3>{event.title}</h3>
-                <p>Revenue Generated</p>
-                <h2>${event.revenue}</h2>
+                <p style={{ textAlign: "center" }}>No top events yet</p>
               </div>
             </div>
-          ))}
+          ) : (
+            topEvents.map((ev: any) => (
+              <div key={ev.eventId || ev._id || ev.title} className="event-card">
+                <div className="event-body">
+                  <h3>{ev.title || ev.event?.title}</h3>
+                  <p>Tickets: {ev.tickets}</p>
+                  <h2>${ev.revenue ?? 0}</h2>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>
