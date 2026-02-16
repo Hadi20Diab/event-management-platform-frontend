@@ -1,59 +1,72 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { apiRequest } from "../../../api/api";
 import "@/app/page.css";
 
-const initialAdmins = [
-  {
-    id: 1,
-    name: "Alice Johnson",
-    email: "alice@admin.com",
-    phone: "11111111",
-    role: "superAdmin",
-  },
-  {
-    id: 2,
-    name: "Bob Smith",
-    email: "bob@admin.com",
-    phone: "222222222",
-    role: "admin",
-  },
-  {
-    id: 3,
-    name: "Charlie Brown",
-    email: "charlie@admin.com",
-    phone: "33333333",
-    role: "admin",
-  },
-];
+interface Admin {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role?: string;
+  createdAt?: string;
+}
 
 export default function ManageAdminsPage() {
-  const [admins, setAdmins] = useState(initialAdmins);
+  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
 
-  const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to delete this admin?")) {
-      setAdmins(admins.filter((admin) => admin.id !== id));
-      alert("Admin deleted successfully (Mock)");
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+
+  const fetchAdmins = async () => {
+    try {
+      setLoading(true);
+      const response = await apiRequest("/admins");
+      const data = response?.admins || response || [];
+      setAdmins(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      setError(err?.message || "Failed to fetch admins");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (adminId: string) => {
+    if (!confirm("Are you sure you want to delete this admin?")) return;
+    try {
+      await apiRequest(`/admins/${adminId}`, "DELETE");
+      setAdmins((prev) => prev.filter((a) => a._id !== adminId));
+      alert("Admin deleted successfully");
+    } catch (err: any) {
+      alert("Error deleting admin: " + (err?.message || err));
     }
   };
 
   const filteredAdmins = admins.filter((admin) => {
-    const matchesName = admin.name.toLowerCase().includes(search.toLowerCase());
+    const q = search.trim().toLowerCase();
+    const matchesName = q ? admin.name.toLowerCase().includes(q) : true;
     const matchesRole = roleFilter ? admin.role === roleFilter : true;
     return matchesName && matchesRole;
   });
+
+  if (loading) return <div>Loading admins...</div>;
+  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
 
   return (
     <section className="admin-dashboard-container">
       <div className="admin-header">
         <div>
           <h1>Manage Admins</h1>
-          <p>View, edit and manage system administrators</p>
+          <p>View and manage platform administrators</p>
         </div>
       </div>
 
-      <div className="admin-actions">
+      <div className="admin-actions" style={{ marginBottom: 20 }}>
         <div className="form-group" style={{ flex: 1 }}>
           <input
             type="text"
@@ -77,35 +90,40 @@ export default function ManageAdminsPage() {
       </div>
 
       <div className="events-grid">
-        {filteredAdmins.map((admin) => (
-          <div key={admin.id} className="event-card">
-            <div className="event-header">
-              <h3 className="event-title">{admin.name}</h3>
-            </div>
-
+        {filteredAdmins.length === 0 ? (
+          <div className="event-card" style={{ gridColumn: "1 / -1" }}>
             <div className="event-body">
-              <p>Email: {admin.email}</p>
-              <p>Phone Number: {admin.phone}</p>
-              <p>Role: {admin.role}</p>
-            </div>
-
-            <div className="event-footer">
-              <button
-                className="btn btn-danger"
-                onClick={() => handleDelete(admin.id)}
-              >
-                Delete
-              </button>
+              <p style={{ textAlign: "center" }}>No admins found</p>
             </div>
           </div>
-        ))}
-      </div>
+        ) : (
+          filteredAdmins.map((admin) => (
+            <div key={admin._id} className="event-card">
+              <div className="event-header">
+                <h3 className="event-title">{admin.name}</h3>
+              </div>
 
-      {filteredAdmins.length === 0 && (
-        <div className="empty-state">
-          <h3>No admins found</h3>
-        </div>
-      )}
+              <div className="event-body">
+                <p>Email: {admin.email}</p>
+                {admin.phone && <p>Phone: {admin.phone}</p>}
+                {admin.role && <p>Role: {admin.role}</p>}
+                {admin.createdAt && (
+                  <p>Joined: {new Date(admin.createdAt).toLocaleDateString()}</p>
+                )}
+              </div>
+
+              <div className="event-footer">
+                <button
+                  className="btn btn-danger"
+                  onClick={() => handleDelete(admin._id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </section>
   );
 }

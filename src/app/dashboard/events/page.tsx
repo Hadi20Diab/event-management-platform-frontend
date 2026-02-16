@@ -50,7 +50,7 @@ export default function Events() {
     const [events, setEvents] = useState(mockEvents);
     const [filters, setFilters] = useState({ category: '', status: '', dateFrom: '', dateTo: '' });
     const [searchTerm, setSearchTerm] = useState('');
-    const { user } = useAuth();
+    const { user } = useAuth() as any;
 
     const handleFilterChange = (e: any) => {
         const { name, value } = e.target;

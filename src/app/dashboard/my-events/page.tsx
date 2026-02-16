@@ -34,7 +34,7 @@ const mockEvents = [
 ];
 
 export default function MyEvents() {
-    const { user } = useAuth();
+    const { user } = useAuth() as any;
 
     const handleUnregister = (eventId: any) => {
         console.log('Unregistering from event:', eventId);

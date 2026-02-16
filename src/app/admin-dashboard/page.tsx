@@ -1,17 +1,55 @@
 "use client";
-import React from "react";
-import { useAuth } from "../../context/AuthContext";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { apiRequest } from "@/api/api";
 import "@/app/page.css";
 
-export default function AdminDashboardPage() {
-  const { user } = useAuth();
+interface DashboardStats {
+  totals: {
+    users: number;
+    events: number;
+    activeEvents: number;
+    revenue: number;
+  };
+  recentActivity: {
+    events: any[];
+    users: any[];
+    registrations: any[];
+  };
+}
 
-  const stats = [
-    { title: "Total Events", value: 12 },
-    { title: "Total Users", value: 248 },
-    { title: "Active Events", value: 8 },
-    { title: "Total Revenue", value: "$12,430" },
-  ];
+export default function AdminDashboardPage() {
+  const { user } = useAuth() as any;
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await apiRequest("/dashboard/stats");
+        setStats(response.data);
+      } catch (error: any) {
+        setError(error.message || "Failed to load dashboard statistics");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchStats();
+    }
+  }, [user]);
+
+  if (loading) return <div>Loading dashboard...</div>;
+  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
+
+  const displayStats = stats ? [
+    { title: "Total Events", value: stats.totals.events },
+    { title: "Total Users", value: stats.totals.users },
+    { title: "Active Events", value: stats.totals.activeEvents },
+    { title: "Total Revenue", value: `$${stats.totals.revenue.toLocaleString()}` },
+  ] : [];
 
   return (
     <section className="admin-dashboard-container">
@@ -24,7 +62,7 @@ export default function AdminDashboardPage() {
 
       {/* Stats Cards */}
       <div className="events-grid">
-        {stats.map((stat, index) => (
+        {displayStats.map((stat, index) => (
           <div key={index} className="event-card">
             <div className="event-header">
               <h3 className="event-title">{stat.title}</h3>
@@ -39,6 +77,41 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
+      {/* Recent Activity */}
+      {stats?.recentActivity && (
+        <div style={{ marginTop: "40px" }}>
+          <h2 style={{ marginBottom: "20px" }}>Recent Activity</h2>
+          
+          <div className="events-grid">
+            <div className="event-card">
+              <div className="event-header">
+                <h3 className="event-title">Recent Events</h3>
+              </div>
+              <div className="event-body">
+                {stats.recentActivity.events.slice(0, 3).map((event: any, index: number) => (
+                  <div key={index} style={{ marginBottom: "8px" }}>
+                    <strong>{event.title}</strong> - {event.status}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="event-card">
+              <div className="event-header">
+                <h3 className="event-title">Recent Registrations</h3>
+              </div>
+              <div className="event-body">
+                {stats.recentActivity.registrations.slice(0, 3).map((reg: any, index: number) => (
+                  <div key={index} style={{ marginBottom: "8px" }}>
+                    {reg.user?.name} → {reg.event?.title}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Quick Actions */}
       <div style={{ marginTop: "40px" }}>
         <h2 style={{ marginBottom: "20px" }}>Quick Actions</h2>
@@ -49,20 +122,26 @@ export default function AdminDashboardPage() {
               <p style={{ marginBottom: "15px" }}>
                 Create and manage events easily.
               </p>
-              <a href="/admin-dashboard/manage-events">
-                <button className="btn btn-primary">Go to Events</button>
-              </a>
+              <button
+                className="btn btn-primary"
+                onClick={() => (window.location.href = "/admin-dashboard/manage-events")}
+              >
+                Manage Events
+              </button>
             </div>
           </div>
 
           <div className="event-card">
             <div className="event-body">
               <p style={{ marginBottom: "15px" }}>
-                View and manage system users.
+                View and manage platform users.
               </p>
-              <a href="/admin-dashboard/users">
-                <button className="btn btn-primary">Manage Users</button>
-              </a>
+              <button
+                className="btn btn-secondary"
+                onClick={() => (window.location.href = "/admin-dashboard/users")}
+              >
+                Manage Users
+              </button>
             </div>
           </div>
 
@@ -71,9 +150,12 @@ export default function AdminDashboardPage() {
               <p style={{ marginBottom: "15px" }}>
                 Check reports and analytics.
               </p>
-              <a href="/admin-dashboard/reports">
-                <button className="btn btn-primary">View Reports</button>
-              </a>
+              <button
+                className="btn btn-primary"
+                onClick={() => (window.location.href = "/admin-dashboard/reports")}
+              >
+                View Reports
+              </button>
             </div>
           </div>
         </div>
