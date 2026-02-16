@@ -2,6 +2,8 @@
 
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { apiRequest } from "../api/api";
+import { hashPassword } from "../utils/hash";
 
 /**
  * @typedef {Object} AuthUser
@@ -33,14 +35,14 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    // Token is in httpOnly cookie (not accessible from JS)
+    // Only restore user data from localStorage if available
     const storedUser = localStorage.getItem("user");
 
-    if (token && storedUser) {
+    if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
       } catch (error) {
-        localStorage.removeItem("token");
         localStorage.removeItem("user");
       }
     }
@@ -49,51 +51,68 @@ export const AuthProvider = ({ children }) => {
 
   // ================= LOGIN =================
   const login = async (email, password) => {
-    console.log("Logging in with:", email, password);
+    try {
+      console.log("Logging in with:", email);
 
-    const mockResponse = {
-      token: "mock-jwt-token",
-      user: {
-        id: Date.now(),
+      // Hash password with SHA256 before sending to backend
+      const hashedPassword = await hashPassword(password);
+
+      // Determine if this is admin or user login based on email or role context
+      const isAdminLogin = email.includes("admin") || window.location.pathname === "/admin-login";
+      const endpoint = isAdminLogin ? "/auth/admin/login" : "/auth/user/signin";
+
+      // Send SHA256 hash - backend will bcrypt it for secure storage
+      const response = await apiRequest(endpoint, "POST", {
         email,
-        name: email.split("@")[0],
-        role: email.includes("superadmin")
-          ? "superAdmin"
-          : email.includes("admin")
-            ? "admin"
-            : undefined,
-        phone: "",
-        registeredEvents: [1, 2],
-      },
-    };
+        password: hashedPassword,
+      });
 
-    localStorage.setItem("token", mockResponse.token);
-    localStorage.setItem("user", JSON.stringify(mockResponse.user));
-    setUser(mockResponse.user);
+      // Token is now in httpOnly cookie (set by backend)
+      // Only store user data in localStorage
+      const userData = response.admin || response.user;
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
 
-    return { success: true, data: mockResponse };
+      return { success: true, data: { user: userData } };
+    } catch (error) {
+      console.error("Login error:", error);
+      return {
+        success: false,
+        message: error.message || "Login failed. Please check your credentials.",
+      };
+    }
   };
 
   // ================= REGISTER =================
   const register = async (userData) => {
-    console.log("Registering:", userData);
+    try {
+      console.log("Registering:", { ...userData, password: "[REDACTED]" });
 
-    const mockResponse = {
-      token: "mock-jwt-token",
-      user: {
-        id: Date.now(),
-        ...userData,
-        role: undefined,
-        phone: userData.phone || "",
-        registeredEvents: [],
-      },
-    };
+      // Hash password with SHA256 before sending to backend
+      const hashedPassword = await hashPassword(userData.password);
 
-    localStorage.setItem("token", mockResponse.token);
-    localStorage.setItem("user", JSON.stringify(mockResponse.user));
-    setUser(mockResponse.user);
+      // Send SHA256 hash - backend will bcrypt it for secure storage
+      const response = await apiRequest("/auth/user/signup", "POST", {
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        password: hashedPassword,
+      });
 
-    return { success: true, data: mockResponse };
+      // Token is now in httpOnly cookie (set by backend)
+      // Only store user data in localStorage
+      const user = response.user;
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+
+      return { success: true, data: { user } };
+    } catch (error) {
+      console.error("Registration error:", error);
+      return {
+        success: false,
+        message: error.message || "Registration failed. Please try again.",
+      };
+    }
   };
 
   // ================= UPDATE PROFILE =================
@@ -110,8 +129,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ================= LOGOUT =================
-  const logout = () => {
-    localStorage.removeItem("token");
+  const logout = async () => {
+    try {
+      // Call backend to clear httpOnly cookie
+      await apiRequest("/auth/logout", "POST");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+    
+    // Clear user data from localStorage
     localStorage.removeItem("user");
     setUser(null);
     router.push("/");

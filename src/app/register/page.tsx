@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
@@ -17,8 +17,15 @@ export default function Register() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, user } = useAuth();
   const router = useRouter();
+
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
