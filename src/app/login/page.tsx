@@ -90,9 +90,6 @@ export default function Login() {
                 Register here
               </Link>
             </p>
-            <p style={{ marginTop: '10px', fontSize: '14px', color: 'var(--gray-color)' }}>
-              Try: admin@test.com / user@test.com (password: any)
-            </p>
           </div>
         </div>
       </div>
