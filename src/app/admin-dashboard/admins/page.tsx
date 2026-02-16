@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import AdminForm from "../../../components/Admin/AdminForm";
 import { apiRequest } from "../../../api/api";
 import "@/app/page.css";
 
@@ -17,6 +18,7 @@ export default function ManageAdminsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [showForm, setShowForm] = useState(false);
   const [roleFilter, setRoleFilter] = useState("");
 
   useEffect(() => {
@@ -27,12 +29,23 @@ export default function ManageAdminsPage() {
     try {
       setLoading(true);
       const response = await apiRequest("/admins");
-      const data = response?.admins || response || [];
-      setAdmins(Array.isArray(data) ? data : []);
+      setAdmins(response.results ?? []);
     } catch (err: any) {
       setError(err?.message || "Failed to fetch admins");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateAdmin = async (adminData: any) => {
+    try {
+      const response = await apiRequest("/admins", "POST", adminData);
+
+      alert(response.message);
+      setShowForm(false);
+      fetchAdmins();
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
@@ -64,7 +77,22 @@ export default function ManageAdminsPage() {
           <h1>Manage Admins</h1>
           <p>View and manage platform administrators</p>
         </div>
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowForm((s) => !s)}
+        >
+          {showForm ? "Cancel" : "Create New Admin"}
+        </button>
       </div>
+
+      {showForm && (
+        <div style={{ marginBottom: 24 }}>
+          <AdminForm
+            onSubmit={handleCreateAdmin}
+            onCancel={() => setShowForm(false)}
+          />
+        </div>
+      )}
 
       <div className="admin-actions" style={{ marginBottom: 20 }}>
         <div className="form-group" style={{ flex: 1 }}>
@@ -108,7 +136,9 @@ export default function ManageAdminsPage() {
                 {admin.phone && <p>Phone: {admin.phone}</p>}
                 {admin.role && <p>Role: {admin.role}</p>}
                 {admin.createdAt && (
-                  <p>Joined: {new Date(admin.createdAt).toLocaleDateString()}</p>
+                  <p>
+                    Joined: {new Date(admin.createdAt).toLocaleDateString()}
+                  </p>
                 )}
               </div>
 
