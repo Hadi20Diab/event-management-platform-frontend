@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
@@ -10,17 +10,23 @@ export default function Register() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
     password: "",
     confirmPassword: "",
   });
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, user } = useAuth() as any;
   const router = useRouter();
 
-  const handleChange = (e) => {
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+
+  const handleChange = (e: any) => {
     const { id, value } = e.target;
 
     if (id === "phone") {
@@ -37,18 +43,9 @@ export default function Register() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-
-    // Phone validation
-    if (!formData.phone) {
-      return setError("Phone number is required");
-    }
-
-    if (formData.phone.length < 8 || formData.phone.length > 15) {
-      return setError("Phone number must be between 8 and 15 digits");
-    }
 
     // Password validation
     if (formData.password !== formData.confirmPassword) {
@@ -65,7 +62,6 @@ export default function Register() {
       const userData = {
         name: formData.name,
         email: formData.email,
-        phone: formData.phone,
         password: formData.password,
       };
 
@@ -114,20 +110,6 @@ export default function Register() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="phone">Phone Number</label>
-              <input
-                type="tel"
-                id="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="Enter your phone number"
-                minLength={8}
-                maxLength={15}
                 required
               />
             </div>

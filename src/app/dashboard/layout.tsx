@@ -9,7 +9,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin } = useAuth() as any;
   const router = useRouter();
 
   useEffect(() => {

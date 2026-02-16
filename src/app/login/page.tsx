@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -11,8 +11,15 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth() as any;
   const router = useRouter();
+
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
@@ -82,9 +89,6 @@ export default function Login() {
               <Link href="/register" style={{ color: 'var(--primary-color)' }}>
                 Register here
               </Link>
-            </p>
-            <p style={{ marginTop: '10px', fontSize: '14px', color: 'var(--gray-color)' }}>
-              Try: admin@test.com / user@test.com (password: any)
             </p>
           </div>
         </div>

@@ -2,15 +2,15 @@
 
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import bcrypt from "bcryptjs";
-import api from "@/lib/apiClient";
+import { apiRequest } from "../api/api";
+import { hashPassword } from "../utils/hash";
 
 /**
  * @typedef {Object} AuthUser
  * @property {number|string} id
  * @property {string} email
  * @property {string} name
- * @property {string} role
+ * @property {string|undefined} role
  * @property {string|undefined} phone
  * @property {Array<number>} registeredEvents
  *
@@ -35,15 +35,14 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    // Token is in httpOnly cookie (not accessible from JS)
+    // Only restore user data from localStorage if available
     const storedUser = localStorage.getItem("user");
 
-    if (token && storedUser) {
+    if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
-        api.setToken(token);
       } catch (error) {
-        localStorage.removeItem("token");
         localStorage.removeItem("user");
       }
     }
@@ -52,82 +51,67 @@ export const AuthProvider = ({ children }) => {
 
   // ================= LOGIN =================
   const login = async (email, password) => {
-    setLoading(true);
     try {
-      const saltRounds = parseInt(
-        process.env.NEXT_APP_SALT_ROUNDS || process.env.NEXT_PUBLIC_SALT_ROUNDS || "10",
-        10
-      );
+      console.log("Logging in with:", email);
 
-      // By default this project expects a bcrypt hash on the backend.
-      const hashed = await bcrypt.hash(password, saltRounds);
+      // Hash password with SHA256 before sending to backend
+      const hashedPassword = await hashPassword(password);
 
-      const res = await api.post("/api/auth/user/signin", {
+      // Determine if this is admin or user login based on email or role context
+      const isAdminLogin = email.includes("admin") || window.location.pathname === "/admin-login";
+      const endpoint = isAdminLogin ? "/auth/admin/login" : "/auth/user/signin";
+
+      // Send SHA256 hash - backend will bcrypt it for secure storage
+      const response = await apiRequest(endpoint, "POST", {
         email,
-        password: hashed,
+        password: hashedPassword,
       });
 
-      const token = res?.token || res?.data?.token;
-      const userResp = res?.user || res?.data?.user || res?.data;
+      // Token is now in httpOnly cookie (set by backend)
+      // Only store user data in localStorage
+      const userData = response.admin || response.user;
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
 
-      if (token) {
-        api.setToken(token);
-        try {
-          localStorage.setItem("token", token);
-          localStorage.setItem("user", JSON.stringify(userResp));
-        } catch (e) {}
-        setUser(userResp);
-        return { success: true, data: { token, user: userResp } };
-      }
-
-      return { success: false, message: res?.message || "Login failed" };
-    } catch (err) {
-      console.error("Login error:", err);
-      return { success: false, message: err?.data?.message || err.message || "Login error" };
-    } finally {
-      setLoading(false);
+      return { success: true, data: { user: userData } };
+    } catch (error) {
+      console.error("Login error:", error);
+      return {
+        success: false,
+        message: error.message || "Login failed. Please check your credentials.",
+      };
     }
   };
 
   // ================= REGISTER =================
   const register = async (userData) => {
-    setLoading(true);
     try {
-      const saltRounds = parseInt(
-        process.env.NEXT_APP_SALT_ROUNDS || process.env.NEXT_PUBLIC_SALT_ROUNDS || "10",
-        10
-      );
+      console.log("Registering:", { ...userData, password: "[REDACTED]" });
 
-      const hashed = await bcrypt.hash(userData.password, saltRounds);
+      // Hash password with SHA256 before sending to backend
+      const hashedPassword = await hashPassword(userData.password);
 
-      const payload = {
+      // Send SHA256 hash - backend will bcrypt it for secure storage
+      const response = await apiRequest("/auth/user/signup", "POST", {
         name: userData.name,
         email: userData.email,
         phone: userData.phone,
-        password: hashed,
+        password: hashedPassword,
+      });
+
+      // Token is now in httpOnly cookie (set by backend)
+      // Only store user data in localStorage
+      const user = response.user;
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+
+      return { success: true, data: { user } };
+    } catch (error) {
+      console.error("Registration error:", error);
+      return {
+        success: false,
+        message: error.message || "Registration failed. Please try again.",
       };
-
-      const res = await api.post("/api/users", payload);
-
-      const token = res?.token || res?.data?.token;
-      const userResp = res?.user || res?.data?.user || res?.data;
-
-      if (token) {
-        api.setToken(token);
-        try {
-          localStorage.setItem("token", token);
-          localStorage.setItem("user", JSON.stringify(userResp));
-        } catch (e) {}
-        setUser(userResp);
-        return { success: true, data: { token, user: userResp } };
-      }
-
-      return { success: false, message: res?.message || "Registration failed" };
-    } catch (err) {
-      console.error("Registration error:", err);
-      return { success: false, message: err?.data?.message || err.message || "Registration error" };
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -145,8 +129,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ================= LOGOUT =================
-  const logout = () => {
-    api.clearToken();
+  const logout = async () => {
+    try {
+      // Call backend to clear httpOnly cookie
+      await apiRequest("/auth/logout", "POST");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+    
+    // Clear user data from localStorage
+    localStorage.removeItem("user");
     setUser(null);
     router.push("/");
   };
