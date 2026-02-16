@@ -36,8 +36,9 @@ export default function ManageEventsPage() {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const response = await apiRequest("/events");
-      const eventsData = response?.events || response || [];
+       const response = await apiRequest("/events");
+       // Backend returns { meta, data }
+       const eventsData = response?.data || response?.events || response || [];
       setEvents(Array.isArray(eventsData) ? eventsData : []);
     } catch (err: any) {
       setError(err?.message || "Failed to fetch events");

@@ -53,7 +53,8 @@ export default function UsersPage() {
   const fetchEvents = async () => {
     try {
       const response = await apiRequest("/events");
-      setEvents(response.events || response);
+      const eventsData = response?.data || response?.events || response || [];
+      setEvents(Array.isArray(eventsData) ? eventsData : []);
     } catch (err) {
       console.error("Failed to fetch events:", err);
     }
