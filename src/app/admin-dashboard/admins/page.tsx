@@ -1,40 +1,50 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { apiRequest } from "../../../api/api";
 import "@/app/page.css";
 
-const initialAdmins = [
-  {
-    id: 1,
-    name: "Alice Johnson",
-    email: "alice@admin.com",
-    phone: "11111111",
-    role: "superAdmin",
-  },
-  {
-    id: 2,
-    name: "Bob Smith",
-    email: "bob@admin.com",
-    phone: "222222222",
-    role: "admin",
-  },
-  {
-    id: 3,
-    name: "Charlie Brown",
-    email: "charlie@admin.com",
-    phone: "33333333",
-    role: "admin",
-  },
-];
+interface Admin {
+  _id: string;
+  id?: string; // For backwards compatibility
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  createdAt?: string;
+}
 
 export default function ManageAdminsPage() {
-  const [admins, setAdmins] = useState(initialAdmins);
+  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
 
-  const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to delete this admin?")) {
-      setAdmins(admins.filter((admin) => admin.id !== id));
-      alert("Admin deleted successfully (Mock)");
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+
+  const fetchAdmins = async () => {
+    try {
+      setLoading(true);
+      const response = await apiRequest("/admins");
+      setAdmins(response.admins || response);
+    } catch (error: any) {
+      setError(error.message || "Failed to fetch admins");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (adminId: string) => {
+    if (!confirm("Are you sure you want to delete this admin?")) return;
+
+    try {
+      await apiRequest(`/admins/${adminId}`, "DELETE");
+      setAdmins(admins.filter((admin) => admin._id !== adminId));
+      alert("Admin deleted successfully");
+    } catch (error: any) {
+      alert("Error deleting admin: " + error.message);
     }
   };
 
@@ -44,10 +54,57 @@ export default function ManageAdminsPage() {
     return matchesName && matchesRole;
   });
 
+  if (loading) return <div>Loading admins...</div>;
+  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
+
   return (
     <section className="admin-dashboard-container">
       <div className="admin-header">
         <div>
+          <h1>Manage Admins</h1>
+          <p>View and manage platform administrators</p>
+        </div>
+      </div>
+
+      {/* Search and Filter Controls */}
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          marginBottom: "30px",
+          alignItems: "center",
+        }}
+          )}
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="event-body">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "15px" }}>
+                  <div>
+                    <strong>Email:</strong>
+                    <p style={{ margin: "5px 0" }}>{admin.email}</p>
+                  </div>
+                  <div>
+                    <strong>Phone:</strong>
+                    <p style={{ margin: "5px 0" }}>{admin.phone}</p>
+                  </div>
+                  {admin.createdAt && (
+                    <div>
+                      <strong>Joined:</strong>
+                      <p style={{ margin: "5px 0" }}>
+                        {new Date(admin.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
           <h1>Manage Admins</h1>
           <p>View, edit and manage system administrators</p>
         </div>

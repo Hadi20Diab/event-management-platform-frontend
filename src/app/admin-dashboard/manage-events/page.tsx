@@ -1,53 +1,278 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import EventForm from "../../../components/Events/EventForm";
 import EventCard from "../../../components/Events/EventCard";
 import { useAuth } from "../../../context/AuthContext";
+import { apiRequest } from "../../../api/api";
 import "@/app/page.css";
 
-const initialEvents = [
-  {
-    id: 1,
-    title: "Summer Music Festival",
-    description: "Annual summer music festival featuring top artists",
-    date: "2024-06-15",
-    location: "Central Park, New York",
-    category: "concert",
-    capacity: 5000,
-    registered: 4200,
-    status: "active",
-    price: 75,
-    organizer: "Music Events Inc.",
-  },
-  {
-    id: 2,
-    title: "Tech Workshop: React Masterclass",
-    description: "Advanced React patterns and best practices",
-    date: "2024-06-20",
-    location: "Tech Hub, San Francisco",
-    category: "workshop",
-    capacity: 100,
-    registered: 85,
-    status: "active",
-    price: 199,
-    organizer: "React Masters",
-  },
-];
+interface Event {
+  _id: string;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  category: string;
+  capacity: number;
+  registered?: number;
+  status: string;
+  price: number;
+  organizer?: string;
+  createdAt?: string;
+}
 
 export default function AdminDashboardPage() {
-  const [events, setEvents] = useState(initialEvents);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [editingEvent, setEditingEvent] = useState(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [error, setError] = useState("");
   const { user } = useAuth();
 
-  const handleCreate = (eventData) => {
-    const newEvent = {
-      ...eventData,
-      id: Date.now(),
-      registered: 0,
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const response = await apiRequest("/events");
+      // Handle both array response and object with events property
+      const eventsData = response.events || response;
+      setEvents(Array.isArray(eventsData) ? eventsData : []);
+    } catch (error: any) {
+      setError(error.message || "Failed to fetch events");
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreate = async (eventData: any) => {
+    try {
+      const newEventData = {
+        ...eventData,
+        organizer: user?.name || "Admin",
+      };
+
+      const response = await apiRequest("/events", "POST", newEventData);
+      const createdEvent = response.event || response;
+      
+      setEvents([...events, createdEvent]);
+      setShowForm(false);
+      alert("Event created successfully!");
+    } catch (error: any) {
+      alert("Error creating event: " + error.message);
+    }
+  };
+
+  const handleEdit = (event: Event) => {
+    setEditingEvent(event);
+    setShowForm(true);
+  };
+
+  const handleUpdate = async (eventData: any) => {
+    if (!editingEvent) return;
+
+    try {
+      const response = await apiRequest(`/events/${editingEvent._id}`, "PUT", eventData);
+      const updatedEvent = response.event || response;
+
+      setEvents(events.map((e) => 
+        e._id === editingEvent._id ? { ...e, ...updatedEvent } : e
+      ));
+      
+      setShowForm(false);
+      setEditingEvent(null);
+      alert("Event updated successfully!");
+    } catch (error: any) {
+      alert("Error updating event: " + error.message);
+    }
+  };
+
+  const handleDelete = async (eventId: string) => {
+    if (!confirm("Are you sure you want to delete this event?")) return;
+
+    try {
+      await apiRequest(`/events/${eventId}`, "DELETE");
+      setEvents(events.filter((e) => e._id !== eventId));
+      alert("Event deleted successfully!");
+    } catch (error: any) {
+      alert("Error deleting event: " + error.message);
+    }
+  };
+
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch = event.title.toLowerCase().includes(search.toLowerCase()) ||
+      event.description.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter ? event.status === statusFilter : true;
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleFormSubmit = (eventData: any) => {
+    if (editingEvent) {
+      handleUpdate(eventData);
+    } else {
+      handleCreate(eventData);
+    }
+  };
+
+  const handleCancelForm = () => {
+    setShowForm(false);
+    setEditingEvent(null);
+  };
+
+  if (loading) return <div>Loading events...</div>;
+  
+  return (
+    <section className="admin-dashboard-container">
+      <div className="admin-header">
+        <div>
+          <h1>Manage Events</h1>
+          <p>Create, edit, and manage platform events</p>
+        </div>
+        <button 
+          className="btn btn-primary" 
+          onClick={() => setShowForm(!showForm)}
+        >
+          {showForm ? "Cancel" : "Create New Event"}
+        </button>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <div style={{ 
+          color: "red", 
+          backgroundColor: "#fee", 
+          padding: "10px", 
+          borderRadius: "5px", 
+          marginBottom: "20px" 
+        }}>
+          Error: {error}
+        </div>
+      )}
+
+      {/* Event Form */}
+      {showForm && (
+        <div style={{ marginBottom: "30px" }}>
+          <EventForm
+            onSubmit={handleFormSubmit}
+            onCancel={handleCancelForm}
+            initialData={editingEvent}
+            isEditing={!!editingEvent}
+          />
+        </div>
+      )}
+
+      {/* Search and Filter Controls */}
+      <div style={{ display: "flex", gap: "20px", marginBottom: "30px", alignItems: "center" }}>
+        <input
+          type="text"
+          placeholder="Search events..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            padding: "10px",
+            borderRadius: "8px",
+            border: "1px solid #ddd",
+            flex: 1,
+          }}
+        />
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          style={{ padding: "10px", borderRadius: "8px", border: "1px solid #ddd" }}
+        >
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="upcoming">Upcoming</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <button className="btn btn-secondary" onClick={fetchEvents}>
+          Refresh
+        </button>
+      </div>
+
+      {/* Events List */}
+      <div className="events-grid">
+        {filteredEvents.length === 0 ? (
+          <div className="event-card" style={{ gridColumn: "1 / -1" }}>
+            <div className="event-body">
+              <p style={{ textAlign: "center" }}>
+                {search || statusFilter ? "No events match your search criteria" : "No events found"}
+              </p>
+            </div>
+          </div>
+        ) : (
+          filteredEvents.map((event) => (
+            <div key={event._id} className="event-card">
+              <div className="event-header">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                  <div style={{ flex: 1 }}>
+                    <h3 className="event-title">{event.title}</h3>
+                    <p style={{ margin: "5px 0", color: "#666", fontSize: "14px" }}>
+                      {event.category} • {event.status}
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => handleEdit(event)}
+                      style={{ fontSize: "12px", padding: "4px 8px" }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(event._id)}
+                      style={{ fontSize: "12px", padding: "4px 8px" }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="event-body">
+                <p style={{ marginBottom: "15px", fontSize: "14px" }}>
+                  {event.description}
+                </p>
+                
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px", fontSize: "14px" }}>
+                  <div>
+                    <strong>Date:</strong>
+                    <br />
+                    {new Date(event.date).toLocaleDateString()}
+                  </div>
+                  <div>
+                    <strong>Location:</strong>
+                    <br />
+                    {event.location}
+                  </div>
+                  <div>
+                    <strong>Capacity:</strong>
+                    <br />
+                    {event.capacity}
+                  </div>
+                  <div>
+                    <strong>Price:</strong>
+                    <br />
+                    ${event.price}
+                  </div>
+                  {event.organizer && (
+                    <div style={{ gridColumn: "1 / -1" }}>
+                      <strong>Organizer:</strong> {event.organizer}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
       status: "active",
     };
     setEvents((prev) => [...prev, newEvent]);
