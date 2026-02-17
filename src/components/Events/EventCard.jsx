@@ -89,7 +89,7 @@ const EventCard = ({ event, onRegister, onUnregister, isRegistered }) => {
         {onRegister && !isRegistered && event.status === 'active' && event.registered < event.capacity && (
           <button
             className="btn btn-primary"
-            onClick={() => onRegister(event.id)}
+            onClick={() => onRegister(event._id || event.id)}
           >
             Register
           </button>
@@ -98,7 +98,7 @@ const EventCard = ({ event, onRegister, onUnregister, isRegistered }) => {
         {onUnregister && isRegistered && (
           <button
             className="btn btn-danger"
-            onClick={() => onUnregister(event.id)}
+            onClick={() => onUnregister(event._id || event.id)}
           >
             Unregister
           </button>
