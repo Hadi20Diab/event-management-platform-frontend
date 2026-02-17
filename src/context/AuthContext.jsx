@@ -124,14 +124,29 @@ export const AuthProvider = ({ children }) => {
     try {
       const isAdmin = user.role === "admin" || user.role === "superAdmin";
 
-      const endpoint = isAdmin ? `/admins/${user._id}` : `/users/${user._id}`;
+      // Ensure we always have a valid ID
+      const userId = user._id || user.id;
+
+      if (!userId) {
+        throw new Error("User ID is missing");
+      }
+
+      const endpoint = isAdmin ? `/admins/${userId}` : `/users/${userId}`;
+
+      console.log("Updating profile at:", endpoint);
 
       const response = await apiRequest(endpoint, "PUT", updatedData);
 
       const updatedUser = response.admin || response.user;
 
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      setUser(updatedUser);
+      // Keep ID consistent
+      const normalizedUser = {
+        ...updatedUser,
+        _id: updatedUser._id || updatedUser.id,
+      };
+
+      localStorage.setItem("user", JSON.stringify(normalizedUser));
+      setUser(normalizedUser);
 
       return { success: true };
     } catch (error) {
