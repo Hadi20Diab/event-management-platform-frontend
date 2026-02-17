@@ -86,7 +86,8 @@ export default function UsersPage() {
       setLoadingUserEvents(true);
       setShowEventsForUser(userId);
       const response = await apiRequest(`/register/user/${userId}`);
-      setSelectedUserEvents(response.registrations || response);
+      const regs = response?.data || response?.registrations || response || [];
+      setSelectedUserEvents(Array.isArray(regs) ? regs : []);
     } catch (err: any) {
       console.error(err);
       setSelectedUserEvents([]);
