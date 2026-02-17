@@ -60,15 +60,9 @@ export default function Events() {
         }
 
         try {
-            await apiRequest('/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userId: user.id,
-                    eventId: eventId
-                })
+            await apiRequest('/register', 'POST', {
+                userId: user.id,
+                eventId: eventId
             });
             
             alert('Successfully registered for event!');
